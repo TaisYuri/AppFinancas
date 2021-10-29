@@ -6,11 +6,15 @@ import {NavigationContainer} from '@react-navigation/native';
 import firebase from './src/services/firebaseConnection';
 import Routes from './src/routes'
 
+import AuthProvider from './src/contexts/auth';
+
 export default function AppFinancas() {
  return (
    <NavigationContainer>
-     <StatusBar backgroundColor='#121212' barStyle='light-content' />
-     <Routes />
+      <AuthProvider>
+        <StatusBar backgroundColor='#121212' barStyle='light-content' />
+        <Routes />
+      </AuthProvider>
    </NavigationContainer>
   );
 }

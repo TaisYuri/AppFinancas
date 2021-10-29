@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
-import { Background, Container, Logo, AreaInput, Input, SubmitButton, SubmitText, Link, LinkText} from './styles';
+import React, {useContext, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import { Background, Container, Logo, AreaInput, Input, SubmitButton, SubmitText, Link, LinkText} from './styles';
+
 
 export default function SignIn() {
 
@@ -9,6 +10,10 @@ export default function SignIn() {
   const[email, setEmail] = useState('');
   const[password, setPassword] = useState('');
 
+ 
+  function exibeLogin(){
+    
+  }
  return (
    <Background>
        <Container> 
@@ -21,7 +26,7 @@ export default function SignIn() {
           <Input placeholder='Senha' autoCorrect={false} autoCapitalize='none' value={password} onChangeText={ (texto) => setPassword(password)}/>
          </AreaInput>
 
-         <SubmitButton onPress={ () => alert("oi")}>
+         <SubmitButton onPress={ exibeLogin}>
            <SubmitText> Login </SubmitText>
          </SubmitButton>
          
