@@ -8,9 +8,11 @@ export default function SignUp(){
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
     
+    //utilizando useContext e extraindo a função do Provider vindo de AuthContext
     const {signUp} = useContext(AuthContext);
 
     function cadastrar(){
+        //A função recebe os parametros de email, pass e nome (funcao está em contexts/auth.js)
         signUp(email, password, nome);
     }
 

@@ -2,7 +2,7 @@ import styled from "styled-components/native";
 
 export const Background = styled.View`
 flex: 1;
-background-color: #151515;
+background-color: #363636;
 
 `;
 // o KeyboardAvoidingView faz com que ao acionar o teclado, todos os elementos subam um pouco 
@@ -27,7 +27,7 @@ export const Input = styled.TextInput.attrs({
 
     placeholderTextColor: 'rgba(255,255,255,0.20)'
 })`
-background-color: rgba(0,0,0,0.20);
+background-color: rgba(0,0,0,0.50);
 width: 90%;
 font-size: 17px;
 color: #fff;
