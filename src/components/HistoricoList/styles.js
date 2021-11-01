@@ -9,6 +9,7 @@ background-color: rgba(0,0,0,0.02);
 
 export const Tipo = styled.View`
 flex-direction: row;
+justify-content: space-between;
 `;
 export const IconView = styled.View`
 flex-direction: row;
@@ -28,4 +29,8 @@ font-style: italic;
 export const Valor = styled.Text`
 font-size: 20px;
 font-weight: bold;
+`;
+
+export const Data = styled.Text`
+font-size: 15px;
 `;

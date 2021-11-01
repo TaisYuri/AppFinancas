@@ -37,7 +37,8 @@ export default function Register() {
       await firebase.database().ref('historico').child(uid).child(key).set({
         tipo: tipo,
         valor: parseFloat(valor),
-        data: format(new Date(), 'dd/MM/yy')
+        data: format(new Date(), 'dd/MM/yy'),
+       
       })
 
       //Atualiza o saldo do usuario
@@ -54,6 +55,7 @@ export default function Register() {
       Keyboard.dismiss();
       setValor('');
       navigation.navigate('Home');
+      
   }
 
   return (

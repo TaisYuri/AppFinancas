@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import {ActivityIndicator} from 'react-native';
 import { AuthContext } from "../../contexts/auth";
 import { AreaInput, Background, Container, Input, SubmitButton, SubmitText } from "../SignIn/styles";
 
@@ -9,7 +10,7 @@ export default function SignUp(){
     const[password, setPassword] = useState('');
     
     //utilizando useContext e extraindo a função do Provider vindo de AuthContext
-    const {signUp} = useContext(AuthContext);
+    const {signUp, carregamento} = useContext(AuthContext);
 
     function cadastrar(){
         //A função recebe os parametros de email, pass e nome (funcao está em contexts/auth.js)
@@ -26,11 +27,12 @@ export default function SignUp(){
                     <Input placeholder='Email' autoCorrect={false} autoCapitalize='none' value={email} onChangeText={ (texto) => setEmail(texto)}/>
                 </AreaInput>
                 <AreaInput> 
-                    <Input placeholder='Senha' autoCorrect={false} autoCapitalize='none' value={password} onChangeText={ (texto) => setPassword(texto)}/>
+                    <Input placeholder='Senha' autoCorrect={false} autoCapitalize='none' value={password} onChangeText={ (texto) => setPassword(texto)} secureTextEntry={true}/>
                 </AreaInput>
 
                 <SubmitButton onPress={ cadastrar }>
-                    <SubmitText> Cadastrar </SubmitText>
+                    {carregamento ? <ActivityIndicator size={20} color='#fff'/>
+                                  : <SubmitText> Cadastrar </SubmitText>}                    
                 </SubmitButton>
             </Container>
         </Background>

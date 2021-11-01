@@ -1,12 +1,13 @@
 import React, {useState,useContext, useEffect} from 'react';
 import {AuthContext} from '../../contexts/auth';
 import firebase from '../../services/firebaseConnection';
-import {format} from 'date-fns';
+import {format, isPast} from 'date-fns';
 
 import {Background, Container, TextNome, TextSaldo, Textcabecalho, Lista} from './styles';
 
 import Header from '../../components/Header';
 import HistoricoList from '../../components/HistoricoList';
+import { Alert } from 'react-native';
 
 export default function Home() {
  
@@ -30,9 +31,10 @@ export default function Home() {
         
         snapshot.forEach( (childItem) => {
           let list = {
-            key: childItem.val().key,
+            key: childItem.key,
             tipo: childItem.val().tipo,
-            valor: childItem.val().valor
+            valor: childItem.val().valor,
+            data: childItem.val().data
           };
           setHistorico(oldArray => [...oldArray, list].reverse());
         })
@@ -40,6 +42,36 @@ export default function Home() {
     }
     loadList();
   },[]);
+
+  function deletar(data){
+    if( !isPast( new Date(data.data))){
+      alert('erro');
+      return;
+    }
+    Alert.alert(
+      'Atenção',
+      `Deseja realmente deletar esta transação?           Valor: R$ ${data.valor} - data: ${data.data}`,
+    [
+      {text: 'Cancelar', style: 'cancel'},
+      {text: 'Continuar', onPress: () => deletarRegistro(data)}
+    ]
+    )
+  }
+
+  async function deletarRegistro(data){
+    await firebase.database().ref('historico').child(uid).child(data.key).remove()
+    .then( async ()=> {
+      let saldoAtual = saldo;
+      data.tipo === 'despesa' ? saldoAtual += parseFloat(data.valor) : saldoAtual -= parseFloat(data.valor);
+
+      await firebase.database().ref('historico').child(uid).child('saldo').set(saldoAtual);
+      
+    })
+    .catch( (error) => {
+      alert(error)
+    })
+  }
+
 
   return (
    <Background>
@@ -52,7 +84,8 @@ export default function Home() {
       <Textcabecalho>Ultimas movimentações</Textcabecalho>
     
      
-        <Lista data={historico} renderItem={ ({item}) => (<HistoricoList data={item} />) } keyExtractor={ item => item.id} showsVerticalScrollIndicator={false}/>
+        <Lista data={historico} renderItem={ ({item}) => (<HistoricoList data={item} deleteItem={deletar }/>) } 
+              keyExtractor={ item => item.id} showsVerticalScrollIndicator={false}/>
           
         
      

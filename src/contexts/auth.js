@@ -1,4 +1,5 @@
 import React, { useState,createContext, useEffect } from "react";
+import {ActivityIndicator} from 'react-native';
 import firebase from '../services/firebaseConnection';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 
@@ -8,6 +9,7 @@ export default function AuthProvider( {children} ){
 
     const[user, setUser] = useState(null);
     const[loading,setLoading] = useState(true);
+    const[carregamento, setCarregamento] = useState(false); // usar para criar o loading no botão de cadastrar e de login
 
     useEffect( () => {
         async function loadStorage(){
@@ -24,6 +26,7 @@ export default function AuthProvider( {children} ){
 
     //Logando usuario
     async function signIn(email, password){
+        setCarregamento(true);
         await firebase.auth().signInWithEmailAndPassword(email, password)
         .then(async (value) => {
             let uid = value.user.uid;
@@ -36,16 +39,19 @@ export default function AuthProvider( {children} ){
                 };
                 setUser(data);
                 storageUser(data);
+                setCarregamento(false);
             })
         })
         .catch( (error) => {
             alert(error.code);
+            setCarregamento(false);
         })
     }
 
 
     //cadastrar usuario no Firebase
     async function signUp(email, password, nome){
+        setCarregamento(true);
         await firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(async (value) =>{
             let uid = value.user.uid;
@@ -61,7 +67,12 @@ export default function AuthProvider( {children} ){
                 };
                 setUser(data);
                 storageUser(data);
+                setCarregamento(false);
             })
+        })
+        .catch( (error) => {
+            alert(error.code);
+            setCarregamento(false);
         })
 
     }
@@ -81,7 +92,7 @@ export default function AuthProvider( {children} ){
 
     return (
         //Via provider vamos passar um boleano (signed, um objeto e uma função que vai cadastrar o usuario no firebase)
-        <AuthContext.Provider value ={ {signed: !!user, user, signUp, signIn, signOut} }>
+        <AuthContext.Provider value ={ {signed: !!user, user, signUp, signIn, signOut, carregamento} }>
         {children}
         </AuthContext.Provider>
     );
