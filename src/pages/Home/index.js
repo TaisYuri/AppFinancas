@@ -1,13 +1,16 @@
 import React, {useState,useContext, useEffect} from 'react';
 import {AuthContext} from '../../contexts/auth';
 import firebase from '../../services/firebaseConnection';
-import {format, isPast} from 'date-fns';
+import {format, isBefore} from 'date-fns';
 
-import {Background, Container, TextNome, TextSaldo, Textcabecalho, Lista} from './styles';
+import {Background, Container, TextNome, TextSaldo, Textcabecalho, Lista, Area} from './styles';
+
+import HistoricoList from '../../components/HistoricoList';
+import { Alert, Platform, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons'
 
 import Header from '../../components/Header';
-import HistoricoList from '../../components/HistoricoList';
-import { Alert } from 'react-native';
+import DatePicker from '../../components/DatePicker';
 
 export default function Home() {
  
@@ -15,6 +18,9 @@ export default function Home() {
   const[saldo, setSaldo] = useState(0);
   const { user } = useContext(AuthContext);
   const uid = user && user.uid;
+
+  const[newDate, setNewDate] = useState(new Date());
+  const[show,setShow] = useState(false);
 
   useEffect(() => {
     //retorna o Saldo na tela
@@ -25,7 +31,7 @@ export default function Home() {
 
       //retorna o historico de transações
       await firebase.database().ref('historico').child(uid).orderByChild('data')
-      .equalTo(format(new Date, 'dd/MM/yy'))
+      .equalTo(format(newDate, 'dd/MM/yyyy'))
       .limitToLast(10).on('value', (snapshot) => {
         setHistorico([]);
         
@@ -41,10 +47,21 @@ export default function Home() {
       })
     }
     loadList();
-  },[]);
+  },[newDate]);
 
   function deletar(data){
-    if( !isPast( new Date(data.data))){
+
+    //pegando data do item:
+    const [diaItem, mesItem, anoItem] = data.data.split('/');
+    const dataItem = new Date(`${anoItem}/ ${mesItem}/ ${diaItem}`);
+    
+    //pegando a data de hoje:
+    const formatDiaHoje = format(new Date(),'dd/MM/yyyy');
+    const [diaHoje, mesHoje, anoHoje] = formatDiaHoje.split('/');
+    const dataHoje = new Date(`${anoHoje}/ ${mesHoje}/ ${diaHoje}`);
+    
+    //fazendo comparação das duas datas para deixar excluir apenas as transações com data de hoje
+    if( isBefore(dataItem, dataHoje)){
       alert('erro');
       return;
     }
@@ -72,6 +89,19 @@ export default function Home() {
     })
   }
 
+  //Função de busca data com DatePicker
+  function abreShowPicker(){
+    setShow(true);
+  }
+
+  function fechaShowPicker(){
+    setShow(false);
+  }
+  function onChange(date){
+    setShow(Platform.OS === 'ios');
+    setNewDate(date);
+    console.log(date);
+  }
 
   return (
    <Background>
@@ -81,13 +111,19 @@ export default function Home() {
         <TextSaldo> R$ {saldo.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')} </TextSaldo> 
       </Container>
       
-      <Textcabecalho>Ultimas movimentações</Textcabecalho>
-    
+      <Area>
+        <TouchableOpacity onPress={abreShowPicker}>
+          <Icon name='event' color='#fff' size={30}/>
+        </TouchableOpacity>
+        <Textcabecalho>Ultimas movimentações</Textcabecalho>
+      </Area>
      
         <Lista data={historico} renderItem={ ({item}) => (<HistoricoList data={item} deleteItem={deletar }/>) } 
               keyExtractor={ item => item.id} showsVerticalScrollIndicator={false}/>
           
-        
+        {show && (
+          <DatePicker onClose={fechaShowPicker} date={newDate} onChange={onChange}/>
+        )}
      
    </Background>
   );
